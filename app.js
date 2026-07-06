@@ -1,7 +1,7 @@
 (function () {
   const GRANDPA_NAME = "Dziadek";
   const VIEWER_NAME = "Viewer";
-  const JITSI_DOMAIN = "meet.jit.si";
+  const MIROTALK_JOIN_URL = "https://p2p.mirotalk.com/join";
   const VIEWER_COUNT = 4;
 
   const gate = document.getElementById("gate");
@@ -29,14 +29,10 @@
   const cameraButton = document.getElementById("cameraButton");
   const micButton = document.getElementById("micButton");
 
-  let api = null;
   let currentRole = "";
   let pendingConfig = null;
   let installPrompt = null;
   let roomPassword = "";
-  let grandpaParticipantId = "";
-  let grandpaMuted = false;
-  let viewerMicOpen = false;
 
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("sw.js").catch(function () {});
@@ -67,21 +63,6 @@
   });
 
   leaveButton.addEventListener("click", resetCall);
-  listenButton.addEventListener("click", toggleGrandpaAudio);
-  cameraButton.addEventListener("click", function () {
-    api && api.executeCommand("toggleVideo");
-  });
-  micButton.addEventListener("click", function () {
-    api && api.executeCommand("toggleAudio");
-  });
-
-  ["pointerdown", "touchstart", "mousedown"].forEach(function (name) {
-    talkButton.addEventListener(name, beginTalk);
-  });
-
-  ["pointerup", "pointercancel", "pointerleave", "touchend", "touchcancel", "mouseup", "mouseleave"].forEach(function (name) {
-    talkButton.addEventListener(name, endTalk);
-  });
 
   renderRoute();
   window.addEventListener("hashchange", renderRoute);
@@ -176,167 +157,42 @@
   }
 
   function startCall(roomName, role, password) {
-    if (!window.JitsiMeetExternalAPI) {
-      showError("Nie zaladowano Jitsi. Sprawdz internet i odswiez.");
-      return;
-    }
-
     showError("");
     currentRole = role;
     roomPassword = password;
-    grandpaParticipantId = "";
-    grandpaMuted = false;
-    viewerMicOpen = false;
 
     gate.classList.add("hidden");
     call.classList.remove("hidden");
-    viewerControls.classList.toggle("hidden", role !== "viewer");
-    grandpaControls.classList.toggle("hidden", role !== "grandpa");
-    connectionText.textContent = "Laczenie";
-
-    api = new window.JitsiMeetExternalAPI(JITSI_DOMAIN, {
-      roomName: roomName,
-      parentNode: meetNode,
-      width: "100%",
-      height: "100%",
-      userInfo: {
-        displayName: role === "grandpa" ? GRANDPA_NAME : VIEWER_NAME
-      },
-      configOverwrite: {
-        disableDeepLinking: true,
-        disableInviteFunctions: true,
-        disableThirdPartyRequests: true,
-        deeplinking: {
-          disabled: true
-        },
-        prejoinConfig: { enabled: false },
-        startWithAudioMuted: role === "viewer",
-        startWithVideoMuted: role === "viewer",
-        startSilent: false,
-        enableWelcomePage: false,
-        toolbarButtons: []
-      },
-      interfaceConfigOverwrite: {
-        DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
-        TILE_VIEW_MAX_COLUMNS: 1
-      }
-    });
-
-    wireJitsiEvents();
+    viewerControls.classList.add("hidden");
+    grandpaControls.classList.add("hidden");
+    connectionText.textContent = role === "grandpa" ? "Nadaje" : "Podglad";
+    meetNode.innerHTML = "";
+    meetNode.appendChild(createMiroTalkFrame(roomName, role));
   }
 
-  function wireJitsiEvents() {
-    api.addEventListener("videoConferenceJoined", function () {
-      connectionText.textContent = currentRole === "grandpa" ? "Nadaje" : "Podglad";
-      if (currentRole === "viewer") {
-        forceViewerMuted();
-      }
-      refreshParticipants();
+  function createMiroTalkFrame(roomName, role) {
+    const frame = document.createElement("iframe");
+    const params = new URLSearchParams({
+      room: roomName,
+      name: role === "grandpa" ? GRANDPA_NAME : VIEWER_NAME,
+      avatar: "0",
+      audio: role === "grandpa" ? "1" : "0",
+      video: role === "grandpa" ? "1" : "0",
+      screen: "0",
+      chat: "0",
+      hide: "0",
+      notify: "0",
+      duration: "unlimited"
     });
 
-    api.addEventListener("participantRoleChanged", function (event) {
-      if (event.role === "moderator" && roomPassword) {
-        api.executeCommand("password", roomPassword);
-      }
-    });
-
-    api.addEventListener("passwordRequired", function () {
-      if (roomPassword) {
-        api.executeCommand("password", roomPassword);
-      }
-    });
-
-    api.addEventListener("participantJoined", refreshParticipants);
-    api.addEventListener("participantLeft", refreshParticipants);
-    api.addEventListener("displayNameChange", refreshParticipants);
-
-    api.addEventListener("audioMuteStatusChanged", function (event) {
-      if (currentRole === "viewer" && !viewerMicOpen && event.muted === false) {
-        forceViewerMuted();
-      }
-      if (currentRole === "grandpa") {
-        micButton.classList.toggle("active", event.muted === false);
-      }
-    });
-
-    api.addEventListener("videoMuteStatusChanged", function (event) {
-      if (currentRole === "grandpa") {
-        cameraButton.classList.toggle("active", event.muted === false);
-      }
-    });
-  }
-
-  function beginTalk(event) {
-    event.preventDefault();
-    if (!api || viewerMicOpen) {
-      return;
-    }
-    viewerMicOpen = true;
-    talkButton.classList.add("active");
-    api.isAudioMuted().then(function (muted) {
-      if (muted) {
-        api.executeCommand("toggleAudio");
-      }
-    });
-  }
-
-  function endTalk(event) {
-    event.preventDefault();
-    if (!api || !viewerMicOpen) {
-      return;
-    }
-    viewerMicOpen = false;
-    talkButton.classList.remove("active");
-    forceViewerMuted();
-  }
-
-  function forceViewerMuted() {
-    api.isAudioMuted().then(function (muted) {
-      if (!muted) {
-        api.executeCommand("toggleAudio");
-      }
-    });
-  }
-
-  function toggleGrandpaAudio() {
-    grandpaMuted = !grandpaMuted;
-    listenButton.classList.toggle("active", grandpaMuted);
-    listenButton.textContent = grandpaMuted ? "Wlacz dziadka" : "Wycisz dziadka";
-    setGrandpaVolume(grandpaMuted ? 0 : 1);
-  }
-
-  function setGrandpaVolume(volume) {
-    if (api && grandpaParticipantId) {
-      api.executeCommand("setParticipantVolume", grandpaParticipantId, volume);
-    }
-  }
-
-  function refreshParticipants() {
-    if (!api || currentRole !== "viewer") {
-      return;
-    }
-
-    api.getRoomsInfo().then(function (data) {
-      const rooms = data && data.rooms ? data.rooms : [];
-      const participants = rooms.flatMap(function (room) {
-        return room.participants || [];
-      });
-      const grandpa = participants.find(function (participant) {
-        return participant.displayName === GRANDPA_NAME;
-      });
-
-      grandpaParticipantId = grandpa ? grandpa.id : "";
-      if (grandpaParticipantId && grandpaMuted) {
-        setGrandpaVolume(0);
-      }
-    }).catch(function () {});
+    frame.src = MIROTALK_JOIN_URL + "?" + params.toString();
+    frame.allow = "camera; microphone; autoplay; fullscreen; display-capture";
+    frame.referrerPolicy = "no-referrer";
+    frame.title = "Dziadek Live";
+    return frame;
   }
 
   function resetCall() {
-    if (api) {
-      api.dispose();
-      api = null;
-    }
     meetNode.innerHTML = "";
     call.classList.add("hidden");
     gate.classList.remove("hidden");
