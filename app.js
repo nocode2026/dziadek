@@ -2,7 +2,7 @@
   const GRANDPA_NAME = "Dziadek";
   const VIEWER_NAME = "Viewer";
   const MIROTALK_JOIN_URL = "https://p2p.mirotalk.com/join";
-  const APP_VERSION = "12";
+  const APP_VERSION = "13";
   const VIEWER_COUNT = 4;
 
   const gate = document.getElementById("gate");
@@ -28,8 +28,6 @@
   const viewerControls = document.getElementById("viewerControls");
   const grandpaControls = document.getElementById("grandpaControls");
   const rotateButton = document.getElementById("rotateButton");
-  const listenButton = document.getElementById("listenButton");
-  const talkButton = document.getElementById("talkButton");
 
   let currentRole = "";
   let pendingConfig = null;
@@ -54,8 +52,6 @@
   joinInstallButton.addEventListener("click", installPwa);
   generateButton.addEventListener("click", generateLinks);
   rotateButton.addEventListener("click", toggleRotateView);
-  listenButton.addEventListener("click", showIframeControlNotice);
-  talkButton.addEventListener("pointerdown", showIframeControlNotice);
 
   document.addEventListener("click", function (event) {
     const button = event.target.closest("[data-copy]");
@@ -272,16 +268,6 @@
       wakeLock.release().catch(function () {});
       wakeLock = null;
     }
-  }
-
-  function showIframeControlNotice(event) {
-    if (event) {
-      event.preventDefault();
-    }
-    showError("Przy MiroTalk te przyciski trzeba obsluzyc w oknie spotkania. Kliknij mikrofon/glosnik w samym obrazie.");
-    window.setTimeout(function () {
-      showError("");
-    }, 3500);
   }
 
   function parseConfigFromHash() {

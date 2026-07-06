@@ -260,7 +260,10 @@ input {
 }
 
 .call[data-role="viewer"] .controls {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  left: auto;
+  right: max(12px, env(safe-area-inset-right));
+  bottom: max(72px, env(safe-area-inset-bottom));
+  grid-template-columns: 148px;
 }
 
 .control-button {
@@ -273,14 +276,6 @@ input {
 
 .control-button.active {
   background: #16a34a;
-}
-
-.control-button.talk {
-  background: #2563eb;
-}
-
-.control-button.talk.active {
-  background: #dc2626;
 }
 
 @media (max-width: 380px) {
@@ -296,7 +291,8 @@ input {
 
 @media (max-width: 480px) {
   .call[data-role="viewer"] .controls {
-    grid-template-columns: 1fr;
+    left: auto;
+    grid-template-columns: 132px;
   }
 }
 
