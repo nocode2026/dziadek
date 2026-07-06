@@ -2,6 +2,7 @@
   const GRANDPA_NAME = "Dziadek";
   const VIEWER_NAME = "Viewer";
   const MIROTALK_JOIN_URL = "https://p2p.mirotalk.com/join";
+  const APP_VERSION = "8";
   const VIEWER_COUNT = 4;
 
   const gate = document.getElementById("gate");
@@ -31,7 +32,7 @@
   let roomPassword = "";
 
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js").then(function (registration) {
+    navigator.serviceWorker.register("sw.js?v=" + APP_VERSION).then(function (registration) {
       registration.update().catch(function () {});
     }).catch(function () {});
   }
@@ -100,7 +101,7 @@
       return randomToken(18);
     });
 
-    const base = location.origin + location.pathname;
+    const base = location.origin + location.pathname + "?v=" + APP_VERSION;
     const grandpaPayload = {
       mode: "grandpa",
       room: room,
