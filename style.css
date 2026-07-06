@@ -1,0 +1,289 @@
+:root {
+  color-scheme: dark;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #0f172a;
+  color: #f8fafc;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+.app {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow: hidden;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.gate {
+  min-height: 100dvh;
+  display: grid;
+  place-content: center;
+  gap: 24px;
+  padding: 24px;
+  background: #111827;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 800;
+}
+
+.status-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 18px rgba(34, 197, 94, 0.7);
+}
+
+.join-form {
+  width: min(420px, calc(100vw - 48px));
+  display: grid;
+  gap: 16px;
+}
+
+.panel {
+  width: min(720px, calc(100vw - 32px));
+  display: grid;
+  gap: 16px;
+}
+
+.panel h2,
+.join-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.muted {
+  margin: 0;
+  color: #cbd5e1;
+  line-height: 1.45;
+}
+
+.admin-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.admin-result,
+.viewer-links {
+  display: grid;
+  gap: 14px;
+}
+
+.join-form label,
+.join-form fieldset,
+.admin-result label,
+.viewer-links label {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  color: #cbd5e1;
+}
+
+.error {
+  margin: 0;
+  padding: 12px;
+  border: 1px solid #991b1b;
+  border-radius: 6px;
+  background: #450a0a;
+  color: #fecaca;
+}
+
+.join-form input[type="text"],
+.join-form input[type="password"],
+.join-form input:not([type]),
+.admin-result input,
+.viewer-links input {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  padding: 0 14px;
+  background: #020617;
+  color: #f8fafc;
+}
+
+.copy-row {
+  display: grid;
+  grid-template-columns: 1fr 86px;
+  gap: 8px;
+}
+
+.copy-row button {
+  min-height: 48px;
+  border: 0;
+  border-radius: 6px;
+  background: #334155;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.join-form fieldset {
+  border: 1px solid #334155;
+  border-radius: 6px;
+  padding: 12px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.join-form legend {
+  padding: 0 6px;
+}
+
+.choice {
+  min-height: 44px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px !important;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  color: #f8fafc !important;
+}
+
+.primary,
+.secondary,
+.control-button,
+.icon-button {
+  border: 0;
+  border-radius: 6px;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.primary {
+  min-height: 52px;
+  background: #2563eb;
+  font-weight: 700;
+}
+
+.secondary {
+  min-height: 52px;
+  background: #334155;
+  font-weight: 700;
+}
+
+.call {
+  position: relative;
+  width: 100vw;
+  height: 100dvh;
+  overflow: hidden;
+  background: #020617;
+}
+
+.meet,
+.meet iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+.topbar {
+  position: absolute;
+  top: max(12px, env(safe-area-inset-top));
+  left: 12px;
+  right: 12px;
+  height: 44px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+}
+
+#connectionText {
+  min-width: 96px;
+  padding: 9px 12px;
+  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.82);
+  color: #e2e8f0;
+  font-size: 14px;
+}
+
+.icon-button {
+  width: 44px;
+  height: 44px;
+  background: rgba(127, 29, 29, 0.92);
+  font-size: 28px;
+  line-height: 1;
+  pointer-events: auto;
+}
+
+.controls {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.control-button {
+  min-height: 58px;
+  padding: 0 14px;
+  background: rgba(30, 41, 59, 0.94);
+  font-weight: 800;
+  touch-action: manipulation;
+}
+
+.control-button.active {
+  background: #16a34a;
+}
+
+.control-button.talk {
+  background: #2563eb;
+}
+
+.control-button.talk.active {
+  background: #dc2626;
+}
+
+@media (max-width: 380px) {
+  .brand h1 {
+    font-size: 28px;
+  }
+
+  .control-button {
+    min-height: 54px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 560px) {
+  .gate {
+    place-content: start center;
+    padding: 20px 16px;
+    overflow: auto;
+  }
+
+  .admin-actions,
+  .copy-row {
+    grid-template-columns: 1fr;
+  }
+}

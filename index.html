@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#111827">
+    <meta name="description" content="Prosty podglad i rozmowa przez WebRTC.">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="stylesheet" href="style.css?v=2">
+    <title>Dziadek Live</title>
+  </head>
+  <body>
+    <main class="app">
+      <section id="gate" class="gate" aria-label="Start">
+        <div class="brand">
+          <span class="status-dot"></span>
+          <h1>Dziadek Live</h1>
+        </div>
+
+        <section id="adminPanel" class="panel hidden" aria-label="Panel admina">
+          <h2>Panel admina</h2>
+          <p class="muted">Wygeneruj komplet linkow. Haslo podaj obserwujacym osobno.</p>
+
+          <div class="admin-actions">
+            <button id="generateButton" type="button" class="primary">Generuj nowe linki</button>
+            <button id="installButton" type="button" class="secondary hidden">Zainstaluj PWA</button>
+          </div>
+
+          <div id="adminResult" class="admin-result hidden">
+            <label>
+              Haslo dla obserwujacych
+              <input id="generatedPassword" readonly>
+            </label>
+
+            <label>
+              Link dla dziadka
+              <div class="copy-row">
+                <input id="grandpaLink" readonly>
+                <button type="button" data-copy="grandpaLink">Kopiuj</button>
+              </div>
+            </label>
+
+            <div id="viewerLinks" class="viewer-links"></div>
+          </div>
+        </section>
+
+        <form id="joinForm" class="join-form hidden">
+          <p id="errorText" class="error hidden"></p>
+          <p id="joinTitle" class="join-title">Start</p>
+
+          <label id="passwordLabel">
+            Haslo
+            <input id="passwordInput" name="password" type="password" autocomplete="current-password" minlength="4">
+          </label>
+
+          <button type="submit" class="primary">Start</button>
+          <button id="joinInstallButton" type="button" class="secondary hidden">Zainstaluj PWA</button>
+        </form>
+      </section>
+
+      <section id="call" class="call hidden" aria-label="Polaczenie">
+        <div id="meet" class="meet"></div>
+
+        <div class="topbar">
+          <span id="connectionText">Laczenie</span>
+          <button id="leaveButton" type="button" class="icon-button" aria-label="Zakoncz">×</button>
+        </div>
+
+        <div id="viewerControls" class="controls hidden">
+          <button id="listenButton" type="button" class="control-button">Wycisz dziadka</button>
+          <button id="talkButton" type="button" class="control-button talk">Mow</button>
+        </div>
+
+        <div id="grandpaControls" class="controls hidden">
+          <button id="cameraButton" type="button" class="control-button">Kamera</button>
+          <button id="micButton" type="button" class="control-button">Mikrofon</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="https://meet.jit.si/external_api.js"></script>
+    <script src="app.js?v=2"></script>
+  </body>
+</html>
