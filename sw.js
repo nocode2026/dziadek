@@ -1,8 +1,8 @@
-const CACHE_NAME = "dziadek-live-v9";
+const CACHE_NAME = "dziadek-live-v12";
 const APP_SHELL = [
-  "./?v=9",
-  "./style.css?v=9",
-  "./app.js?v=9",
+  "./?v=12",
+  "./style.css?v=12",
+  "./app.js?v=12",
   "./manifest.webmanifest",
   "./icon-192.png",
   "./icon-512.png"
