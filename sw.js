@@ -1,15 +1,14 @@
-const CACHE_NAME = "dziadek-live-v6";
+const CACHE_NAME = "dziadek-live-v7";
 const APP_SHELL = [
-  "./",
-  "./index.html",
-  "./style.css?v=6",
-  "./app.js?v=6",
+  "./style.css?v=7",
+  "./app.js?v=7",
   "./manifest.webmanifest",
   "./icon-192.png",
   "./icon-512.png"
 ];
 
 self.addEventListener("install", function (event) {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then(function (cache) {
       return cache.addAll(APP_SHELL);
@@ -29,6 +28,8 @@ self.addEventListener("activate", function (event) {
             return caches.delete(name);
           })
       );
+    }).then(function () {
+      return self.clients.claim();
     })
   );
 });
@@ -38,9 +39,24 @@ self.addEventListener("fetch", function (event) {
     return;
   }
 
+  if (event.request.mode === "navigate") {
+    event.respondWith(
+      fetch(event.request).catch(function () {
+        return caches.match("./index.html");
+      })
+    );
+    return;
+  }
+
   event.respondWith(
-    caches.match(event.request).then(function (cached) {
-      return cached || fetch(event.request);
+    fetch(event.request).then(function (response) {
+      const copy = response.clone();
+      caches.open(CACHE_NAME).then(function (cache) {
+        cache.put(event.request, copy);
+      });
+      return response;
+    }).catch(function () {
+      return caches.match(event.request);
     })
   );
 });
