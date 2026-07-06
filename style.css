@@ -97,6 +97,7 @@ input {
 
 .join-form label,
 .join-form fieldset,
+.panel label,
 .admin-result label,
 .viewer-links label {
   display: grid;
@@ -114,9 +115,16 @@ input {
   color: #fecaca;
 }
 
+.saved-password {
+  margin: -4px 0 0;
+  color: #fef3c7;
+  font-size: 14px;
+}
+
 .join-form input[type="text"],
 .join-form input[type="password"],
 .join-form input:not([type]),
+.panel input,
 .admin-result input,
 .viewer-links input {
   width: 100%;
