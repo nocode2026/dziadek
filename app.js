@@ -24,10 +24,6 @@
   const leaveButton = document.getElementById("leaveButton");
   const viewerControls = document.getElementById("viewerControls");
   const grandpaControls = document.getElementById("grandpaControls");
-  const listenButton = document.getElementById("listenButton");
-  const talkButton = document.getElementById("talkButton");
-  const cameraButton = document.getElementById("cameraButton");
-  const micButton = document.getElementById("micButton");
 
   let currentRole = "";
   let pendingConfig = null;
@@ -35,7 +31,9 @@
   let roomPassword = "";
 
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js").catch(function () {});
+    navigator.serviceWorker.register("sw.js").then(function (registration) {
+      registration.update().catch(function () {});
+    }).catch(function () {});
   }
 
   window.addEventListener("beforeinstallprompt", function (event) {
