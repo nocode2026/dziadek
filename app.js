@@ -203,8 +203,12 @@
         displayName: role === "grandpa" ? GRANDPA_NAME : VIEWER_NAME
       },
       configOverwrite: {
+        disableDeepLinking: true,
         disableInviteFunctions: true,
         disableThirdPartyRequests: true,
+        deeplinking: {
+          disabled: true
+        },
         prejoinConfig: { enabled: false },
         startWithAudioMuted: role === "viewer",
         startWithVideoMuted: role === "viewer",
