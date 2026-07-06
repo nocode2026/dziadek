@@ -2,7 +2,7 @@
   const GRANDPA_NAME = "Dziadek";
   const VIEWER_NAME = "Viewer";
   const MIROTALK_JOIN_URL = "https://p2p.mirotalk.com/join";
-  const APP_VERSION = "8";
+  const APP_VERSION = "9";
   const VIEWER_COUNT = 4;
 
   const gate = document.getElementById("gate");
@@ -12,6 +12,7 @@
   const installButton = document.getElementById("installButton");
   const joinInstallButton = document.getElementById("joinInstallButton");
   const adminResult = document.getElementById("adminResult");
+  const customPasswordInput = document.getElementById("customPasswordInput");
   const generatedPassword = document.getElementById("generatedPassword");
   const grandpaLink = document.getElementById("grandpaLink");
   const viewerLinks = document.getElementById("viewerLinks");
@@ -20,6 +21,7 @@
   const joinTitle = document.getElementById("joinTitle");
   const passwordLabel = document.getElementById("passwordLabel");
   const passwordInput = document.getElementById("passwordInput");
+  const savedPasswordText = document.getElementById("savedPasswordText");
   const meetNode = document.getElementById("meet");
   const connectionText = document.getElementById("connectionText");
   const leaveButton = document.getElementById("leaveButton");
@@ -80,6 +82,8 @@
     form.classList.remove("hidden");
     currentRole = pendingConfig.mode;
     passwordInput.value = "";
+    savedPasswordText.classList.add("hidden");
+    savedPasswordText.textContent = "";
 
     if (pendingConfig.mode === "grandpa") {
       joinTitle.textContent = "Telefon dziadka";
@@ -89,12 +93,19 @@
       joinTitle.textContent = "Podglad";
       passwordLabel.classList.remove("hidden");
       passwordInput.required = true;
+      const rememberedPassword = pendingConfig.pass || loadSavedPassword(pendingConfig.room);
+      if (rememberedPassword) {
+        passwordInput.value = rememberedPassword;
+        savedPasswordText.textContent = "Zapamietane haslo: " + rememberedPassword;
+        savedPasswordText.classList.remove("hidden");
+      }
     }
   }
 
   async function generateLinks() {
     const room = "dziadek-" + randomToken(24);
-    const password = readablePassword();
+    const customPassword = customPasswordInput.value.trim();
+    const password = customPassword || readablePassword();
     const passHash = await sha256(password);
     const grandpaKey = randomToken(18);
     const viewerKeys = Array.from({ length: VIEWER_COUNT }, function () {
@@ -117,6 +128,7 @@
       const viewerPayload = {
         mode: "viewer",
         room: room,
+        pass: password,
         passHash: passHash,
         key: key
       };
@@ -148,6 +160,7 @@
         showError("Nieprawidlowe haslo.");
         return;
       }
+      savePassword(pendingConfig.room, password);
       startCall(pendingConfig.room, "viewer", password);
       return;
     }
@@ -242,6 +255,14 @@
       return null;
     }
     return null;
+  }
+
+  function savePassword(room, password) {
+    localStorage.setItem("dziadek.password." + room, password);
+  }
+
+  function loadSavedPassword(room) {
+    return localStorage.getItem("dziadek.password." + room) || "";
   }
 
   function encodePayload(payload) {

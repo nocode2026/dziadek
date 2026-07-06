@@ -8,7 +8,7 @@
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" href="icon-192.png" sizes="192x192" type="image/png">
     <link rel="apple-touch-icon" href="icon-192.png">
-    <link rel="stylesheet" href="style.css?v=8">
+    <link rel="stylesheet" href="style.css?v=9">
     <title>Dziadek Live</title>
   </head>
   <body>
@@ -22,6 +22,11 @@
         <section id="adminPanel" class="panel hidden" aria-label="Panel admina">
           <h2>Panel admina</h2>
           <p class="muted">Wygeneruj komplet linkow. Haslo podaj obserwujacym osobno.</p>
+
+          <label>
+            Wlasne haslo
+            <input id="customPasswordInput" type="text" autocomplete="off" placeholder="zostaw puste, aby wygenerowac">
+          </label>
 
           <div class="admin-actions">
             <button id="generateButton" type="button" class="primary">Generuj nowe linki</button>
@@ -54,6 +59,7 @@
             Haslo
             <input id="passwordInput" name="password" type="password" autocomplete="current-password" minlength="4">
           </label>
+          <p id="savedPasswordText" class="saved-password hidden"></p>
 
           <button type="submit" class="primary">Start</button>
           <button id="joinInstallButton" type="button" class="secondary hidden">Zainstaluj PWA</button>
@@ -80,6 +86,6 @@
       </section>
     </main>
 
-    <script src="app.js?v=8"></script>
+    <script src="app.js?v=9"></script>
   </body>
 </html>
