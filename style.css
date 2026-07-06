@@ -51,12 +51,11 @@ input {
   font-weight: 800;
 }
 
-.status-dot {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: #22c55e;
-  box-shadow: 0 0 18px rgba(34, 197, 94, 0.7);
+.app-logo {
+  width: 58px;
+  height: 58px;
+  border-radius: 8px;
+  object-fit: contain;
 }
 
 .join-form {
