@@ -2,7 +2,7 @@
   const GRANDPA_NAME = "Dziadek";
   const VIEWER_NAME = "Viewer";
   const MIROTALK_JOIN_URL = "https://p2p.mirotalk.com/join";
-  const APP_VERSION = "9";
+  const APP_VERSION = "12";
   const VIEWER_COUNT = 4;
 
   const gate = document.getElementById("gate");
@@ -27,11 +27,15 @@
   const leaveButton = document.getElementById("leaveButton");
   const viewerControls = document.getElementById("viewerControls");
   const grandpaControls = document.getElementById("grandpaControls");
+  const rotateButton = document.getElementById("rotateButton");
+  const listenButton = document.getElementById("listenButton");
+  const talkButton = document.getElementById("talkButton");
 
   let currentRole = "";
   let pendingConfig = null;
   let installPrompt = null;
   let roomPassword = "";
+  let wakeLock = null;
 
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("sw.js?v=" + APP_VERSION).then(function (registration) {
@@ -49,6 +53,9 @@
   installButton.addEventListener("click", installPwa);
   joinInstallButton.addEventListener("click", installPwa);
   generateButton.addEventListener("click", generateLinks);
+  rotateButton.addEventListener("click", toggleRotateView);
+  listenButton.addEventListener("click", showIframeControlNotice);
+  talkButton.addEventListener("pointerdown", showIframeControlNotice);
 
   document.addEventListener("click", function (event) {
     const button = event.target.closest("[data-copy]");
@@ -64,6 +71,11 @@
   });
 
   leaveButton.addEventListener("click", resetCall);
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden && !call.classList.contains("hidden")) {
+      requestWakeLock();
+    }
+  });
 
   renderRoute();
   window.addEventListener("hashchange", renderRoute);
@@ -98,6 +110,9 @@
         passwordInput.value = rememberedPassword;
         savedPasswordText.textContent = "Zapamietane haslo: " + rememberedPassword;
         savedPasswordText.classList.remove("hidden");
+        window.setTimeout(function () {
+          handleJoinSubmit();
+        }, 250);
       }
     }
   }
@@ -175,11 +190,17 @@
 
     gate.classList.add("hidden");
     call.classList.remove("hidden");
-    viewerControls.classList.add("hidden");
+    call.dataset.role = role;
+    meetNode.classList.remove("rotated-view");
+    rotateButton.classList.remove("active");
+    rotateButton.textContent = "Obroc obraz";
+    viewerControls.classList.toggle("hidden", role !== "viewer");
     grandpaControls.classList.add("hidden");
     connectionText.textContent = role === "grandpa" ? "Nadaje" : "Podglad";
     meetNode.innerHTML = "";
     meetNode.appendChild(createMiroTalkFrame(roomName, role));
+    requestCallFullscreen();
+    requestWakeLock();
   }
 
   function createMiroTalkFrame(roomName, role) {
@@ -192,23 +213,75 @@
       video: role === "grandpa" ? "1" : "0",
       screen: "0",
       chat: "0",
-      hide: "0",
+      hide: role === "viewer" ? "1" : "0",
       notify: "0",
       duration: "unlimited"
     });
 
     frame.src = MIROTALK_JOIN_URL + "?" + params.toString();
     frame.allow = "camera; microphone; autoplay; fullscreen; display-capture";
+    frame.allowFullscreen = true;
     frame.referrerPolicy = "no-referrer";
     frame.title = "Dziadek Live";
     return frame;
   }
 
+  function toggleRotateView() {
+    const isRotated = meetNode.classList.toggle("rotated-view");
+    rotateButton.classList.toggle("active", isRotated);
+    rotateButton.textContent = isRotated ? "Normalnie" : "Obroc obraz";
+  }
+
   function resetCall() {
+    releaseWakeLock();
+    delete call.dataset.role;
+    meetNode.classList.remove("rotated-view");
     meetNode.innerHTML = "";
     call.classList.add("hidden");
     gate.classList.remove("hidden");
     renderRoute();
+  }
+
+  function requestCallFullscreen() {
+    const request = call.requestFullscreen || call.webkitRequestFullscreen || call.msRequestFullscreen;
+    if (request) {
+      try {
+        const result = request.call(call);
+        if (result && typeof result.catch === "function") {
+          result.catch(function () {});
+        }
+      } catch (error) {}
+    }
+  }
+
+  async function requestWakeLock() {
+    if (!("wakeLock" in navigator)) {
+      return;
+    }
+
+    try {
+      wakeLock = await navigator.wakeLock.request("screen");
+      wakeLock.addEventListener("release", function () {
+        wakeLock = null;
+      });
+    } catch (error) {}
+  }
+
+  function releaseWakeLock() {
+    if (wakeLock) {
+      wakeLock.release().catch(function () {});
+      wakeLock = null;
+    }
+  }
+
+  function showIframeControlNotice(event) {
+    if (event) {
+      event.preventDefault();
+    }
+    showError("Przy MiroTalk te przyciski trzeba obsluzyc w oknie spotkania. Kliknij mikrofon/glosnik w samym obrazie.");
+    window.setTimeout(function () {
+      showError("");
+    }, 3500);
   }
 
   function parseConfigFromHash() {
