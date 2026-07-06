@@ -2,7 +2,7 @@
   const GRANDPA_NAME = "Dziadek";
   const VIEWER_NAME = "Viewer";
   const MIROTALK_JOIN_URL = "https://p2p.mirotalk.com/join";
-  const APP_VERSION = "13";
+  const APP_VERSION = "14";
   const VIEWER_COUNT = 4;
 
   const gate = document.getElementById("gate");
@@ -106,9 +106,6 @@
         passwordInput.value = rememberedPassword;
         savedPasswordText.textContent = "Zapamietane haslo: " + rememberedPassword;
         savedPasswordText.classList.remove("hidden");
-        window.setTimeout(function () {
-          handleJoinSubmit();
-        }, 250);
       }
     }
   }
